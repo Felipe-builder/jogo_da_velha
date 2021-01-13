@@ -3,8 +3,7 @@ Este é o programa principal que irá importar funções de outras bibliotecas, 
 do jogo da velha.
 """
 from time import sleep
-
-from jogodavelha.lib.dados import *
+from funcoes.dados.banco_de_dados import *
 
 c, r = 1, 0
 arq = 'listadejogadores.txt'

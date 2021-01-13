@@ -1,5 +1,5 @@
 Felipe Vasconcelos;2.0
 Joao;2.0
+Sidcley Wilker;2.5
 Luan Saiva;0.5
-Sidcley Wilker;1.5
 <desconhecido>;0.0
