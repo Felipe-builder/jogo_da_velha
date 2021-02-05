@@ -1,5 +1,5 @@
-Felipe Vasconcelos;2.0
-Joao;2.0
+Joao;8.0
+<desconhecido>;4.0
+Felipe Vasconcelos;4.0
 Sidcley Wilker;2.5
-Luan Saiva;0.5
-<desconhecido>;0.0
+Luan Saiva;1.5

@@ -6,10 +6,7 @@ from time import sleep
 from funcoes.dados.banco_de_dados import *
 
 c, r = 1, 0
-arq = 'listadejogadores.txt'
-if not arquivoExiste(arq):
-    criarArquivo(arq)
-carregarArquivo(arq)
+arq = inicialzaodearquivo()
 while r != 4:
     r = menuprincipal(['Criar Jogador', 'Carregar Jogadores já Criado', 'Ranking', 'Sair do Jogo'], 'MENU PRINCIPAL')
     if r == 1:
@@ -27,13 +24,13 @@ while r != 4:
                 if op == 1:
                     while True:
                         name, name1 = sorteio(c)
-                        m = construimatriz3x3()
-                        mostrajogo(m)
-                        while not finalizando(m, name, name1):
-                            jogando(m)
+                        matriz, simbolo = construimatriz3x3()
+                        mostrajogo(matriz)
+                        while not finalizando(matriz, name, name1):
+                            simbolo = jogando(matriz, simbolo)
                             print('==' * 15)
                             sleep(0.3)
-                            mostrajogo(m)
+                            mostrajogo(matriz)
                         print(f'FINALIZANDO A {c}ª PARTIDA!')
                         sleep(1)
                         print('°°' * 20)

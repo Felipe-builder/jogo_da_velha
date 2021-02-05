@@ -1,6 +1,14 @@
 from funcoes.logica import *
 
 
+def inicialzaodearquivo():
+    arq = 'listadejogadores.txt'
+    if not arquivoExiste(arq):
+        criarArquivo(arq)
+    carregarArquivo(arq)
+    return arq
+
+
 def arquivoExiste(nome):
     """
     -> verifica se existe um arquivo para salvar os dados dos participantes do jogo. dando assim o return

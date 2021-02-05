@@ -1,7 +1,5 @@
 p1 = p2 = escolhido = jogador_x = jogador_o = 0
 jogadores = []
-diretorio = dict
-simb = '\033[1:31m X \033[m'
 
 
 def construimatriz3x3():
@@ -10,25 +8,24 @@ def construimatriz3x3():
     para o programa principal na variavel retorno (m)
     param matriz: lista composta(matriz)
     """
-    global simb
     matriz = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-    simb = '\033[1:31m X \033[m'
-    return matriz
+    simb = 'X'
+    return matriz, simb
 
 
 def mostrajogo(matriz):
     """
     -> Função mostrar a matriz
     """
-    print('\033[7m+---+---+---+\033[m')
+    print('+---+---+---+')
     for linha in range(0, 3):
         for coluna in range(0, 3):
-            print(f'\033[7m|{matriz[linha][coluna]:^3}', end='\033[7m')
-        print('|\033[m')
-        print('\033[7m+---+---+---+\033[m')
+            print(f'|{matriz[linha][coluna]:^3}', end='')
+        print('|')
+        print('+---+---+---+')
 
 
-def jogando(matriz):
+def jogando(matriz, simb):
     """
     -> função responsável para fazer o pedido da entrada de valor pelo teclado, para assim realizar a troca de
     valores na função ;Troca().
@@ -37,18 +34,18 @@ def jogando(matriz):
     param pos: valor int que retornará da função validadorInt() que é aonde o Jogador do momento quer fazer
     seu lance.
     """
-    global simb
     res = False
     while not res:
         pos = validadorInt(f'Vai Jogar [{simb}] em qual posição? ')
         res = troca(matriz, pos, simb)
         if not res:
             if pos < 1 or pos > 0:
-                print('\033[31mERRO!Digite um valor entre 1 e 9\033[m')
+                print('ERRO!Digite um valor entre 1 e 9')
             else:
-                print('\033[31mERRO: Lugar ocupado!\033[m')
+                print('ERRO: Lugar ocupado!')
         else:
             simb = trocajogador(simb)
+        return simb
 
 
 def troca(matriz, posicao, simbolo):
@@ -77,10 +74,10 @@ def trocajogador(simbolo):
     ou seja a cada troca realizada pela função 'troca()'
     param simbolo: é uma variavel string que vai retornar
     """
-    if simbolo == '\033[1:31m X \033[m':
-        simbolo = '\033[1:34m O \033[m'
+    if simbolo == 'X':
+        simbolo = 'O'
     else:
-        simbolo = '\033[1:31m X \033[m'
+        simbolo = 'X'
     return simbolo
 
 
@@ -98,59 +95,78 @@ def finalizando(matriz, nome, nome1):
     o jogo deve ser encerrado.
     """
     global jogador_o, jogador_x
-    vp_x = False
-    vp_o = False
-    acabar = False
     empate = False
     cont = 0
-    for linha in range(0, 3):
-        if matriz[linha][0] == matriz[linha][1] == matriz[linha][2]:
-            if matriz[linha][0] == '\033[1:31m X \033[m':
-                jogador_x += 1
-                vp_x = True
-            if matriz[linha][0] == '\033[1:34m O \033[m':
-                jogador_o += 1
-                vp_o = True
-            acabar = True
-    for coluna in range(0, 3):
-        if matriz[0][coluna] == matriz[1][coluna] == matriz[2][coluna]:
-            if matriz[0][coluna] == '\033[1:31m X \033[m':
-                jogador_x += 1
-                vp_x = True
-            if matriz[0][coluna] == '\033[1:34m O \033[m':
-                jogador_o += 1
-                vp_o = True
-            acabar = True
-    if matriz[0][0] == matriz[1][1] == matriz[2][2]:
-        if matriz[0][0] == '\033[1:31m X \033[m':
-            jogador_x += 1
-            vp_x = True
-        if matriz[0][0] == '\033[1:34m O \033[m':
-            jogador_o += 1
-            vp_o = True
-        acabar = True
-    if matriz[0][2] == matriz[1][1] == matriz[2][0]:
-        if matriz[0][2] == '\033[1:31m X \033[m':
-            jogador_x += 1
-            vp_x = True
-        if matriz[0][2] == '\033[1:34m O \033[m':
-            jogador_o += 1
-            vp_o = True
-        acabar = True
+    acabar, vitoria_do_x, vitoria_do_o = analises(matriz)
+    if vitoria_do_x:
+        jogador_x += 1
+    elif vitoria_do_o:
+        jogador_o += 1
     for linha in range(0, 3):
         for coluna in range(0, 3):
-            if matriz[linha][coluna] != '\033[1:31m X \033[m' and matriz[linha][coluna] != '\033[1:34m O \033[m':
+            if matriz[linha][coluna] != 'X' and matriz[linha][coluna] != 'O':
                 cont += 1
     if cont == 0:
         acabar = True
     if acabar:
-        if not vp_x and not vp_o:
+        if not vitoria_do_x and not vitoria_do_o:
             jogador_x += 0.5
             jogador_o += 0.5
             print('Empatou')
             empate = True
-    placar(vp_x, vp_o, empate, nome, nome1)
+    placar(vitoria_do_x, vitoria_do_o, empate, nome, nome1)
     return acabar
+
+
+def analises(matriz):
+    acabar = vitoria_do_x = vitoria_do_o = False
+    acabar, vitoria_do_x, vitoria_do_o = analisando_linha(matriz, acabar, vitoria_do_x, vitoria_do_o)
+    acabar, vitoria_do_x, vitoria_do_o = analisando_coluna(matriz, acabar, vitoria_do_x, vitoria_do_o)
+    acabar, vitoria_do_x, vitoria_do_o = analisando_diagonal_pri(matriz, acabar, vitoria_do_x, vitoria_do_o)
+    acabar, vitoria_do_x, vitoria_do_o = analisando_diagonal_sec(matriz, acabar, vitoria_do_x, vitoria_do_o)
+    return acabar, vitoria_do_x, vitoria_do_o
+
+
+def analisando_linha(matriz, acabar, vitoria_do_x, vitoria_do_o):
+    for linha in range(0, 3):
+        if matriz[linha][0] == matriz[linha][1] == matriz[linha][2]:
+            if matriz[linha][0] == 'X':
+                vitoria_do_x = True
+            if matriz[linha][0] == 'O':
+                vitoria_do_o = True
+            acabar = True
+    return acabar, vitoria_do_x, vitoria_do_o
+
+
+def analisando_coluna(matriz, acabar, vitoria_do_x, vitoria_do_o):
+    for coluna in range(0, 3):
+        if matriz[0][coluna] == matriz[1][coluna] == matriz[2][coluna]:
+            if matriz[0][coluna] == 'X':
+                vitoria_do_x = True
+            if matriz[0][coluna] == 'O':
+                vitoria_do_o = True
+            acabar = True
+    return acabar, vitoria_do_x, vitoria_do_o
+
+
+def analisando_diagonal_pri(matriz, acabar, vitoria_do_x, vitoria_do_o):
+    if matriz[0][0] == matriz[1][1] == matriz[2][2]:
+        if matriz[0][0] == 'X':
+            vitoria_do_x = True
+        if matriz[0][0] == 'O':
+            vitoria_do_o = True
+        acabar = True
+    return acabar, vitoria_do_o, vitoria_do_x
+
+
+def analisando_diagonal_sec(matriz, acabar, vitoria_do_x, vitoria_do_o):
+    if matriz[0][2] == matriz[1][1] == matriz[2][0]:
+        if matriz[0][2] == 'X':
+            vitoria_do_x = True
+        if matriz[0][2] == 'O':
+            vitoria_do_o = True
+        acabar = True
+    return acabar, vitoria_do_o, vitoria_do_x
 
 
 def lin(tam=42):
@@ -196,7 +212,7 @@ def validadorInt(msg):
         try:
             n = int(input(msg))
         except(TypeError, ValueError):
-            print('\033[31mDigite um número inteiro válido\033[m')
+            print('Digite um número inteiro válido')
         else:
             ok = True
     return n
@@ -236,7 +252,7 @@ def validadordejogadores():
     while True:
         player2 = validadorInt('Escolha O Segundo Jogador: ')
         if player1 == player2:
-            print('\033[31mERRO! Você não pode escolher o mesmo jogador!\033[m')
+            print('ERRO! Você não pode escolher o mesmo jogador!')
         elif 0 <= player2 < len(jogadores):
             print(f'O 2ª Jogador é {jogadores[player2]["nome"]}')
             break
