@@ -75,16 +75,17 @@ def carregarArquivo(arq):
     -> esta função servirá para criação da temporária lista de jogadores com seus respectivos dados
     que sofrerá alterações dentro do jogo, e finalmente fará o registro no documento na função 'atualizaarquivo().'
     """
-    jogadores.clear()
+    jogadores = []
     a = open(arq, 'r')
     for linha in a:
         dado = linha.split(';')
         dado[1] = dado[1].replace('\n', '')
         jogadores.append({'nome': dado[0], 'ponto': float(dado[1])})
     a.close()
+    return jogadores
 
 
-def atualizaarquivo(arq):
+def atualizaarquivo(arq, jogadores):
     """
     -> irá atualizar o arquivo com dados de todos os jogadores registrados, para ser mais preciso atualizar
     sua pontuação.
@@ -95,7 +96,7 @@ def atualizaarquivo(arq):
     a.close()
 
 
-def ranking():
+def ranking(jogadores):
     """
     -> tal função tem por objetivo organizar a lista temporária de jogadores por ordem de maior pontuador até
     o menor pontuador e apresenta-los de forma mais agradavél ao usuário.

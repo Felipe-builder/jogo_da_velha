@@ -1,5 +1,5 @@
-Joao;8.0
-<desconhecido>;4.0
+Joao;53.0
+<desconhecido>;25.0
 Felipe Vasconcelos;4.0
 Sidcley Wilker;2.5
 Luan Saiva;1.5

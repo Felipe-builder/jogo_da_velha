@@ -1,5 +1,25 @@
-p1 = p2 = escolhido = jogador_x = jogador_o = 0
-jogadores = []
+from time import sleep
+
+p1 = p2 = escolhido = pts_jogador_x = pts_jogador_o = 0
+
+
+def opcao_1(c, jogadores):
+    resp = " "
+    while resp != "N":
+        duelistas = sorteio(resp, c, jogadores)
+        matriz, simbolo = construimatriz3x3()
+        mostrajogo(matriz)
+        while not finalizando(matriz, duelistas, jogadores):
+            simbolo = jogando(matriz, simbolo)
+            print('==' * 15)
+            sleep(0.3)
+            mostrajogo(matriz)
+        print(f'FINALIZANDO A {c}ª PARTIDA!')
+        sleep(1)
+        print('°°' * 20)
+        c += 1
+        resp = str(input('Quer Continuar? [S/N]')).strip().upper()[0]
+        troca_devalores(jogadores, resp, c, trade=True)
 
 
 def construimatriz3x3():
@@ -81,7 +101,7 @@ def trocajogador(simbolo):
     return simbolo
 
 
-def finalizando(matriz, nome, nome1):
+def finalizando(matriz, duelistas, jogadores):
     """
     -> Função responsavel pela validação se a partida terminou ou não, dando um return a cada vez que é chamada
     de 'False' ou 'True' dependendo das regras de finalização do jogo da velha, por tanto quando o jogo chegar
@@ -94,27 +114,30 @@ def finalizando(matriz, nome, nome1):
     mais casas para se jogar, este param contabilizar a possibilidades de jogadas e caso seja int(0) então
     o jogo deve ser encerrado.
     """
-    global jogador_o, jogador_x
+    global pts_jogador_o, pts_jogador_x
     empate = False
     cont = 0
     acabar, vitoria_do_x, vitoria_do_o = analises(matriz)
-    if vitoria_do_x:
-        jogador_x += 1
-    elif vitoria_do_o:
-        jogador_o += 1
+    atribuindo_ponto(vitoria_do_x, vitoria_do_o)
+    analisando_empate(matriz, cont)
+    if acabar:
+        if not vitoria_do_x and not vitoria_do_o:
+            pts_jogador_x += 0.5
+            pts_jogador_o += 0.5
+            print('Empatou')
+            empate = True
+    placar(vitoria_do_x, vitoria_do_o, empate, duelistas, jogadores)
+    return acabar
+
+
+def analisando_empate(matriz, cont):
+    acabar = False
     for linha in range(0, 3):
         for coluna in range(0, 3):
             if matriz[linha][coluna] != 'X' and matriz[linha][coluna] != 'O':
                 cont += 1
     if cont == 0:
         acabar = True
-    if acabar:
-        if not vitoria_do_x and not vitoria_do_o:
-            jogador_x += 0.5
-            jogador_o += 0.5
-            print('Empatou')
-            empate = True
-    placar(vitoria_do_x, vitoria_do_o, empate, nome, nome1)
     return acabar
 
 
@@ -156,7 +179,7 @@ def analisando_diagonal_pri(matriz, acabar, vitoria_do_x, vitoria_do_o):
         if matriz[0][0] == 'O':
             vitoria_do_o = True
         acabar = True
-    return acabar, vitoria_do_o, vitoria_do_x
+    return acabar, vitoria_do_x, vitoria_do_o
 
 
 def analisando_diagonal_sec(matriz, acabar, vitoria_do_x, vitoria_do_o):
@@ -166,7 +189,15 @@ def analisando_diagonal_sec(matriz, acabar, vitoria_do_x, vitoria_do_o):
         if matriz[0][2] == 'O':
             vitoria_do_o = True
         acabar = True
-    return acabar, vitoria_do_o, vitoria_do_x
+    return acabar, vitoria_do_x, vitoria_do_o
+
+
+def atribuindo_ponto(vitoria_do_x, vitoria_do_o):
+    global pts_jogador_o, pts_jogador_x
+    if vitoria_do_x:
+        pts_jogador_x += 1
+    elif vitoria_do_o:
+        pts_jogador_o += 1
 
 
 def lin(tam=42):
@@ -218,7 +249,7 @@ def validadorInt(msg):
     return n
 
 
-def escolhadeJogadores():
+def escolhadeJogadores(jogadores):
     """
     -> esta tem por função selecionar dois jogadores, dos quais estão dentro da lista com os dados de todos os
     jogadores registrados, não podendo jogar participantes com os memos nomes. Sendo assim uma condição
@@ -231,7 +262,7 @@ def escolhadeJogadores():
         return False
     for cod, j in enumerate(jogadores):
         print(f'{cod} - {j["nome"]}')
-    p1, p2 = validadordejogadores()
+    p1, p2 = validadordejogadores(jogadores)
     jogador1 = jogadores[p1]['nome']
     jogador2 = jogadores[p2]['nome']
     ok = True
@@ -239,7 +270,7 @@ def escolhadeJogadores():
     return ok
 
 
-def validadordejogadores():
+def validadordejogadores(jogadores):
     """
     -> esta função não permite que a escolha do jogadores seja feita de forma correta e evitando problemas é
     por tanto um validador de escolha dos jogadores como o próprio nome já diz.
@@ -259,7 +290,7 @@ def validadordejogadores():
     return player1, player2
 
 
-def sorteio(contador):
+def sorteio(resposta, contador, jogadores):
     """
     -> tem for função sortear quem vai começar a partida e fazer as alterações ou trocas de valores do placar do
     jogador vitorioso de 'X' que na proxima rodada vai ficar com 'O':
@@ -269,31 +300,43 @@ def sorteio(contador):
         'Fulano' jogando de 'O' está com '1' ponto
         'Beltrano' jogando de 'X' está com '0' ponto.
     """
-    global jogador_o, jogador_x
+    global pts_jogador_o, pts_jogador_x
+    duelistas = ["", ""]
     print(lin())
-    if contador > 1:
-        jogador_o, jogador_x = jogador_x, jogador_o
-        jogadores[p1]['ponto'], jogadores[p2]['ponto'] = jogadores[p2]['ponto'], jogadores[p1]['ponto']
+    troca_devalores(jogadores, resposta, contador)
     if contador % 2 != 0:
-        nome = jogadores[p1]["nome"]
-        nome1 = jogadores[p2]["nome"]
-        print(f'{nome} vai começar a partida')
+        duelistas[0] = jogadores[p1]["nome"]
+        duelistas[1] = jogadores[p2]["nome"]
+        print(f'{duelistas[0]} vai começar a partida')
     else:
         print(f'{jogadores[p2]["nome"]} vai começar a partida')
-        nome = jogadores[p2]["nome"]
-        nome1 = jogadores[p1]["nome"]
-    return nome, nome1
+        duelistas[0] = jogadores[p2]["nome"]
+        duelistas[1] = jogadores[p1]["nome"]
+    return duelistas
 
 
-def placar(vp_x, vp_o, emp, nome, nome1):
+def troca_devalores(jogadores, resposta, contador, trade=False):
+    global pts_jogador_x, pts_jogador_o
+    if not trade:
+        if resposta == "S":
+            pts_jogador_o, pts_jogador_x = pts_jogador_x, pts_jogador_o
+            jogadores[p1]['ponto'], jogadores[p2]['ponto'] = jogadores[p2]['ponto'], jogadores[p1]['ponto']
+            print('Olá primeira troca.')
+    elif trade:
+        if resposta == 'N' and contador > 2:
+            jogadores[p1]['ponto'], jogadores[p2]['ponto'] = jogadores[p2]['ponto'], jogadores[p1]['ponto']
+            print('Olá segunda troca.')
+
+
+def placar(vp_x, vp_o, emp, duelistas, jogadores):
     """
     -> está função altera o valor (key) 'ponto' do jogador que está dentro da lista de jogadores, caso ganhe
     +1 ponto, caso empate +0.5 para ambos jogadores. informando assim o placar temporário e posteriormente
     alterando a lista de jogadores que séra registrada em documento.
     """
     print(lin(10))
-    print(f'{nome} de X: {jogador_x} pts')
-    print(f'{nome1} de O: {jogador_o} pts')
+    print(f'{duelistas[0]} de X: {pts_jogador_x} pts')
+    print(f'{duelistas[1]} de O: {pts_jogador_o} pts')
     if vp_x:
         jogadores[p1]['ponto'] += 1
     elif vp_o:
