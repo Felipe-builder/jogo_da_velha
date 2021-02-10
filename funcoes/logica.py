@@ -1,6 +1,28 @@
+from funcoes.dados.banco_de_dados import *
+
 from time import sleep
 
 p1 = p2 = escolhido = pts_jogador_x = pts_jogador_o = 0
+
+
+def opcao1_menuprincipal(arq):
+    titulo('CRIANDO JOGADORES')
+    nome = str(input(f'Nome do Jogador: ')).strip()
+    cadastrar(arq, nome, 0)
+    jogadores = carregar_arquivo(arq)
+    return jogadores
+
+
+def opcao2_menuprincipal(jogadores, arq, c):
+    if len(jogadores) < 2:
+        print('Você precisa criar mais Jogador')
+    else:
+        pronto = escolhadeJogadores(jogadores)
+        if pronto:
+            op = menuprincipal(['Continuar?', 'Voltar?'], 'Começar a Partida')
+            if op == 1:
+                opcao_1(c, jogadores)
+                atualizaarquivo(arq, jogadores)
 
 
 def opcao_1(c, jogadores):
@@ -321,11 +343,9 @@ def troca_devalores(jogadores, resposta, contador, trade=False):
         if resposta == "S":
             pts_jogador_o, pts_jogador_x = pts_jogador_x, pts_jogador_o
             jogadores[p1]['ponto'], jogadores[p2]['ponto'] = jogadores[p2]['ponto'], jogadores[p1]['ponto']
-            print('Olá primeira troca.')
     elif trade:
         if resposta == 'N' and contador > 2:
             jogadores[p1]['ponto'], jogadores[p2]['ponto'] = jogadores[p2]['ponto'], jogadores[p1]['ponto']
-            print('Olá segunda troca.')
 
 
 def placar(vp_x, vp_o, emp, duelistas, jogadores):
@@ -344,3 +364,18 @@ def placar(vp_x, vp_o, emp, duelistas, jogadores):
     elif emp:
         jogadores[p1]['ponto'] += 0.5
         jogadores[p2]['ponto'] += 0.5
+
+
+def ranking(jogadores):
+    """
+    -> tal função tem por objetivo organizar a lista temporária de jogadores por ordem de maior pontuador até
+    o menor pontuador e apresenta-los de forma mais agradavél ao usuário.
+    """
+    for c in range(0, len(jogadores) - 1):
+        for i in range(c, len(jogadores)):
+            if jogadores[c]['ponto'] < jogadores[i]['ponto']:
+                jogadores[c], jogadores[i] = jogadores[i], jogadores[c]
+    titulo('RANKING DOS JOGADORES')
+    for r, j in enumerate(jogadores):
+        print(f'{r+1:}ª - {j["nome"]:.<30} {j["ponto"]} pts')
+    print(lin())

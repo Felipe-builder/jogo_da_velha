@@ -3,13 +3,13 @@ from funcoes.logica import *
 
 def inicialzaodearquivo():
     arq = 'listadejogadores.txt'
-    if not arquivoExiste(arq):
-        criarArquivo(arq)
-    carregarArquivo(arq)
+    if not arquivo_existe(arq):
+        criar_arquivo(arq)
+    carregar_arquivo(arq)
     return arq
 
 
-def arquivoExiste(nome):
+def arquivo_existe(nome):
     """
     -> verifica se existe um arquivo para salvar os dados dos participantes do jogo. dando assim o return
     para o programa principal seguir.
@@ -23,7 +23,7 @@ def arquivoExiste(nome):
         return True
 
 
-def criarArquivo(nome):
+def criar_arquivo(nome):
     """
     -> tal função cria o arquivo caso o return da função anterior der um return 'False'.
     """
@@ -70,7 +70,7 @@ def cadastrar(arq, nome='<desconhecido>', pontos=0):
             a.close()
 
 
-def carregarArquivo(arq):
+def carregar_arquivo(arq):
     """
     -> esta função servirá para criação da temporária lista de jogadores com seus respectivos dados
     que sofrerá alterações dentro do jogo, e finalmente fará o registro no documento na função 'atualizaarquivo().'
@@ -94,18 +94,3 @@ def atualizaarquivo(arq, jogadores):
     for x in jogadores:
         a.write(f'{x["nome"]};{x["ponto"]}\n')
     a.close()
-
-
-def ranking(jogadores):
-    """
-    -> tal função tem por objetivo organizar a lista temporária de jogadores por ordem de maior pontuador até
-    o menor pontuador e apresenta-los de forma mais agradavél ao usuário.
-    """
-    for c in range(0, len(jogadores) - 1):
-        for i in range(c, len(jogadores)):
-            if jogadores[c]['ponto'] < jogadores[i]['ponto']:
-                jogadores[c], jogadores[i] = jogadores[i], jogadores[c]
-    titulo('RANKING DOS JOGADORES')
-    for r, j in enumerate(jogadores):
-        print(f'{r+1:}ª - {j["nome"]:.<30} {j["ponto"]} pts')
-    print(lin())
