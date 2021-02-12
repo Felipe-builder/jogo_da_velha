@@ -20,4 +20,3 @@ while r != 4:
         titulo('JOGO FINALIZADO')
     else:
         print('\033[31mDigite um valor entre 1 e 4\033[m')
-
